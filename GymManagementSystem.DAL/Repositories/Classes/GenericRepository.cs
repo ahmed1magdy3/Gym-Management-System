@@ -62,5 +62,14 @@ namespace GymManagementSystem.DAL.Repositories.Classes
         {
             return await dbContext.Set<TEntity>().AnyAsync(predicate, ct);
         }
+
+        public async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate = null, CancellationToken ct = default)
+        {
+            return predicate is null 
+                ? await dbContext.Set<TEntity>().CountAsync(ct)
+                : await dbContext.Set<TEntity>().CountAsync(predicate, ct);
+        }
+
+        
     }
 }
