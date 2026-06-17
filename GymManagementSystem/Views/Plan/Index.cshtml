@@ -1,4 +1,28 @@
-﻿@model IEnumerable<Plan>
+﻿@model IEnumerable<PlanViewModel>
+
+@{
+    ViewData["Title"] = "All Plans";
+}
+
+@* Alert Messages *@
+@if (TempData["Success"] is not null)
+{
+    @* Show Success Message if Member is Created Successfully *@
+    <div id="Alert" class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+else if (TempData["Error"] is not null)
+{
+    @* Show Error Message if Member Failed To Create *@
+    <div id="Alert" class="alert alert-danger alert-dismissible fade show">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 
 <div class="container">
     <header class="d-flex justify-content-between mt-5 mb-4 align-items-center">
@@ -49,7 +73,7 @@
                                     <a href="\Plan\Edit\@plan.Id" class="btn btn-outline btn-sm flex-fill">
                                             <i class="bi bi-pencil me-1"></i>Edit
                                         </a>
-                                        <form href="\Plans\Activate\1" method="post" class="flex-fill">
+                                        <form asp-controller="Plan" asp-action ="Activate" asp-route-id="@plan.Id" method="post" class="flex-fill">
                                             @if(plan.IsActive)
                                             {
                                             @* If Plan is Active put class text-danger if not text-success *@
@@ -94,3 +118,9 @@
 
 
 </div>
+
+
+@section Scripts
+{
+    <partial name="_AlertBoxScript" />
+}

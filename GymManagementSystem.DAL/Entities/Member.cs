@@ -2,7 +2,7 @@
 {
     public class Member : GymUser
     {
-        public string Photo { get; set; } = default!;
+        public string? Photo { get; set; } = default!;
 
 
         #region Relationships

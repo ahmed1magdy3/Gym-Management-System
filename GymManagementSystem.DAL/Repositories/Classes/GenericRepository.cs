@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,7 +30,7 @@ namespace GymManagementSystem.DAL.Repositories.Classes
             return entity;
         }
 
-        public void AddPlan(TEntity entity)
+        public void Add(TEntity entity)
         {
             dbContext.Set<TEntity>().Add(entity);
         }
@@ -49,6 +50,17 @@ namespace GymManagementSystem.DAL.Repositories.Classes
         public async Task<int> CompleteAsync()
         {
             return await dbContext.SaveChangesAsync();
+        }
+
+        public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, bool isTracked = false, CancellationToken ct = default)
+        {
+            var entities = isTracked ? dbContext.Set<TEntity>() : dbContext.Set<TEntity>().AsNoTracking();
+            return await entities.FirstOrDefaultAsync(predicate, ct);
+        }
+
+        public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default)
+        {
+            return await dbContext.Set<TEntity>().AnyAsync(predicate, ct);
         }
     }
 }

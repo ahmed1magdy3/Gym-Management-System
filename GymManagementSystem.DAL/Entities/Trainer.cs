@@ -9,6 +9,7 @@ namespace GymManagementSystem.DAL.Entities
 {
     public class Trainer : GymUser
     {
+        public string? Photo { get; set; } = default!;
         public Specialties Specialize { get; set; }
 
         #region Relationships

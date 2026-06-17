@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,9 +12,14 @@ namespace GymManagementSystem.DAL.Repositories.Interfaces
     {
         Task<IEnumerable<TEntity>> GetAll(bool isTracked, CancellationToken ct = default);
         Task<TEntity?> GetById(int id, CancellationToken ct = default);
-        void AddPlan(TEntity entity);
+        void Add(TEntity entity);
         void Update(TEntity entity);
         void Delete(int id);
         Task<int> CompleteAsync();
+
+        Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, bool isTracked = false, CancellationToken ct = default);
+        Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
+
+
     }
 }
