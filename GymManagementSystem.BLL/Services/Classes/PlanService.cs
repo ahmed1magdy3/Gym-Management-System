@@ -13,20 +13,17 @@ namespace GymManagementSystem.BLL.Services.Classes
 {
     public class PlanService : IPlanService
     {
-        private readonly IGenericRepository<Plan> _planRepository;
-        private readonly IGenericRepository<MemberShip> _membershipRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public PlanService(IGenericRepository<Plan> planRepository,
-                            IGenericRepository<MemberShip> memberShipRepository)
+        public PlanService(IUnitOfWork unitOfWork)
         {
-            _planRepository = planRepository;
-            _membershipRepository = memberShipRepository;
+           _unitOfWork = unitOfWork;
         }
 
         // Get
         public async Task<IEnumerable<PlanViewModel>> GetAllPlansAsync(CancellationToken ct = default)
         {
-            var plans = await _planRepository.GetAll(false,ct);
+            var plans = await _unitOfWork.GetRepository<Plan>().GetAll(false,ct);
             if (!plans.Any()) return [];
 
             var planViewModel = plans.Select(p => new PlanViewModel()
@@ -44,7 +41,7 @@ namespace GymManagementSystem.BLL.Services.Classes
 
         public async Task<PlanViewModel?> GetPlanDetailsAsync(int planId, CancellationToken ct = default)
         {
-            var plan = await _planRepository.GetById(planId,ct);
+            var plan = await _unitOfWork.GetRepository<Plan>().GetById(planId,ct);
             if (plan == null) return null;
 
             var planViewModel = new PlanViewModel()
@@ -62,7 +59,7 @@ namespace GymManagementSystem.BLL.Services.Classes
 
         public async Task<UpdatePlanViewModel?> GetPlanToUpdateAsync(int planId, CancellationToken ct = default)
         {
-            var plan = await _planRepository.GetById(planId,ct);
+            var plan = await _unitOfWork.GetRepository<Plan>().GetById(planId,ct);
             if (plan == null) return null;
 
             var updatePlanViewModel = new UpdatePlanViewModel()
@@ -80,10 +77,10 @@ namespace GymManagementSystem.BLL.Services.Classes
 
         public async Task<bool> UpdatePlanDetailsAsync(int id, UpdatePlanViewModel model, CancellationToken ct = default)
         {
-            var plan = await _planRepository.GetById(id, ct);
+            var plan = await _unitOfWork.GetRepository<Plan>().GetById(id, ct);
             if (plan == null) return false;
 
-            var ActiveMemberShip = await _membershipRepository.FirstOrDefaultAsync(mb => mb.PlanId == id && mb.EndDate > DateTime.Now, false, ct);
+            var ActiveMemberShip = await _unitOfWork.GetRepository<MemberShip>().FirstOrDefaultAsync(mb => mb.PlanId == id && mb.EndDate > DateTime.Now, false, ct);
             if (plan.IsActive && ActiveMemberShip != null) return false;
 
             plan.Name = model.PlanName;
@@ -92,25 +89,25 @@ namespace GymManagementSystem.BLL.Services.Classes
             plan.Price = model.Price;
             plan.UpdatedAt = DateTime.Now;
 
-            _planRepository.Update(plan);
+            _unitOfWork.GetRepository<Plan>().Update(plan);
 
-            var result = await _planRepository.CompleteAsync();
+            var result = await _unitOfWork.CompleteAsync(ct);
             return result > 0;
         }
 
         public async Task<bool> ActivationPlanAsync(int planId, CancellationToken ct = default)
         {
-            var plan = await _planRepository.GetById(planId, ct);
+            var plan = await _unitOfWork.GetRepository<Plan>().GetById(planId, ct);
             if (plan == null) return false;
 
-            var ActiveMemberShip = await _membershipRepository.FirstOrDefaultAsync(mb => mb.PlanId == planId && mb.EndDate > DateTime.Now, false, ct);
+            var ActiveMemberShip = await _unitOfWork.GetRepository<MemberShip>().FirstOrDefaultAsync(mb => mb.PlanId == planId && mb.EndDate > DateTime.Now, false, ct);
             if ( plan.IsActive && ActiveMemberShip != null) return false;
 
             plan.IsActive = ! plan.IsActive;
 
-            _planRepository.Update(plan);
+            _unitOfWork.GetRepository<Plan>().Update(plan);
 
-            var result = await _planRepository.CompleteAsync();
+            var result = await _unitOfWork.CompleteAsync(ct);
             return result > 0;
         }
 
