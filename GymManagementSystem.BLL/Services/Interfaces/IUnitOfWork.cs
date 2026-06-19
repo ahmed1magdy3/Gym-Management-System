@@ -14,5 +14,7 @@ namespace GymManagementSystem.BLL.Services.Interfaces
 
         public Task<int> CompleteAsync(CancellationToken ct = default);
 
+        public ISessionRepository sessionRepository { get; }
+
     }
 }

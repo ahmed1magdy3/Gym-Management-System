@@ -14,10 +14,14 @@ namespace GymManagementSystem.BLL.Services.Classes
     public class UnitOfWork : IUnitOfWork
     {
         private readonly GymDbContext dbContext;
-        private readonly Dictionary<string, object> _Repos = []; 
+        private readonly Dictionary<string, object> _Repos = [];
+
+        public ISessionRepository sessionRepository { get;}
+
         public UnitOfWork(GymDbContext dbContext)
         {
             this.dbContext = dbContext;
+            sessionRepository = new SessionRepository(dbContext);
         }
         public IGenericRepository<TEntity> GetRepository<TEntity>() where TEntity : BaseEntity, new()
         {
@@ -35,7 +39,7 @@ namespace GymManagementSystem.BLL.Services.Classes
 
         public async Task<int> CompleteAsync(CancellationToken ct = default)
         {
-            return await dbContext.SaveChangesAsync();
+            return await dbContext.SaveChangesAsync(ct);
         }
     }
 }
